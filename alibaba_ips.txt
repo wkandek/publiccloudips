@@ -1,0 +1,5 @@
+# V0.1 from Varnish file plus hand edited ranges - wkandek
+47.89.85.0/24
+47.74.192.0/18
+47.74.128.0/18
+47.74.128.0/17
