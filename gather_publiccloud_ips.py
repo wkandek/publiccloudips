@@ -267,7 +267,7 @@ if __name__ == '__main__':
     rs, pv = get_aws(args.verbose, rs, pv)
     rs, pv = get_azure(args.verbose, rs, pv)
     rs, pv = get_gcp(rs, pv)
-    rs, pv = get_oracle(args.verbose, ps, rv)
+    rs, pv = get_oracle(args.verbose, rs, pv)
     rs, pv = get_generic("digitalocean", args.verbose, rs, pv)
     rs, pv = get_generic("ovh", args.verbose, rs, pv)
     rs, pv = get_file("alibaba", rs, pv)
