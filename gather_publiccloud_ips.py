@@ -6,6 +6,7 @@ there is one function for each provder that implements the prescribed mechanism:
 - Alibaba Cloud ranges are in a local config file
 - a generic BGP based fucntion used for DigitalOcean and OVH
 
+the IP addresses are sorted, the larger CIDR groups come first, otherwise by numeric value ascending
 
 AWS:
 - download https://ip-ranges.amazonaws.com/ip-ranges.json
@@ -234,22 +235,42 @@ def get_generic(search, verbosity, resultset, providerversion):
     return resultset, providerversion
 
 
+def sort_ip(ip):
+    """ sort function for IPv4 and IPv6 CIDR ranges
+        favors the biggest network first i.e. 1.2.3.0/24 comes after 1.2.0.0/16"""
+    if "." in ip:
+        return (int(ip.split("/")[1] or "0"),
+                int(ip.split("/")[0].split(".")[0]),
+                int(ip.split("/")[0].split(".")[1]),
+                int(ip.split("/")[0].split(".")[2]),
+                int(ip.split("/")[0].split(".")[3])
+               )
+    elif ":" in ip:
+        return (int(ip.split("/")[1] or "0"),
+                int(ip.split(":")[0],16),
+                int(ip.split(":")[1],16),
+                int(ip.split(":")[2] or "0",16)
+               )
+                
+
 def print_resultset(start, resultset, providerversion):
     """prints the results gathered, and pre- and appends comment lines with version info"""
+    # build a set of providers
     pcp = set() 
     for i in resultset:
         if resultset[i] not in pcp:
             pcp.add(resultset[i])
 
+    # print all providers and their ranges in alphabetical order
     print(f"# Start run {start.strftime('%Y/%m/%d %H:%M:%S')}")
     for p in sorted(pcp):
         if p.upper() in providerversion:
             print(f"# {p} Start Versiondata: {providerversion[p.upper()]}")
         else:
             print(f"# {p} Start")
-        for i in resultset:
-            if p in resultset[i]:
-                print(i)
+        for ip in sorted(resultset, key = sort_ip): 
+            if p in resultset[ip]:
+                print(ip)
         print(f"# {p} End")
     end = datetime.datetime.utcnow()
     print(f"# End run {end.strftime('%Y/%m/%d %H:%M:%S')}")
